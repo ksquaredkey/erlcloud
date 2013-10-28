@@ -2,6 +2,8 @@
 
 -module(erlcloud_sqs).
 
+-export([configure/2, configure/3, new/2, new/3]).
+
 -export([
          add_permission/3, add_permission/4,
          change_message_visibility/3, change_message_visibility/4,
@@ -17,8 +19,8 @@
          set_queue_attributes/2, set_queue_attributes/3
         ]).
 
--include_lib("erlcloud/include/erlcloud.hrl").
--include_lib("erlcloud/include/erlcloud_aws.hrl").
+-include("erlcloud.hrl").
+-include("erlcloud_aws.hrl").
 
 -define(API_VERSION, "2012-11-05").
 
@@ -33,6 +35,30 @@
 -type(sqs_queue_attribute_name() :: all | approximate_number_of_messages |
                                     approximate_number_of_messages_not_visible | visibility_timeout |
                                     created_timestamp | last_modified_timestamp | policy).
+
+
+
+-spec(new/2 :: (string(), string()) -> aws_config()).
+new(AccessKeyID, SecretAccessKey) ->
+    #aws_config{access_key_id=AccessKeyID,
+                secret_access_key=SecretAccessKey}.
+
+-spec(new/3 :: (string(), string(), string()) -> aws_config()).
+new(AccessKeyID, SecretAccessKey, Host) ->
+    #aws_config{access_key_id=AccessKeyID,
+                secret_access_key=SecretAccessKey,
+                sqs_host=Host}.
+
+-spec(configure/2 :: (string(), string()) -> ok).
+configure(AccessKeyID, SecretAccessKey) ->
+    put(aws_config, new(AccessKeyID, SecretAccessKey)),
+    ok.
+
+-spec(configure/3 :: (string(), string(), string()) -> ok).
+configure(AccessKeyID, SecretAccessKey, Host) ->
+    put(aws_config, new(AccessKeyID, SecretAccessKey, Host)),
+    ok.
+
 
 -spec add_permission/3 :: (string(), string(), sqs_acl()) -> ok.
 add_permission(QueueName, Label, Permissions) ->
